@@ -100,16 +100,17 @@ const displayCart = () => {
         totalPrice += tree.price * tree.quantity;
 
         cartItemDiv.innerHTML = `
-           <div class="bg-[#f0fdf4] flex justify-between items-center mb-2 p-2 rounded-lg">
+           <div class="flex justify-between md:bg-[#f0fdf4]  items-center mb-2 p-2 rounded-lg ">
                 <div>
                     <p class="font-semibold text-sm">${tree.name}</p>
                     <p class="text-gray-500 text-xs mt-1">
                         ৳ ${tree.price} <i class="fa-solid fa-xmark text-gray-400 text-xs"></i> ${tree.quantity}
                     </p>
                 </div>
+                <div>
                 <button onclick="removeFromCart(${index})" class="text-gray-500 hover:text-red-700">
                     <i class="fa-solid fa-xmark"></i>
-                </button>
+                </button></div>
             </div>`;
         cartContainer.appendChild(cartItemDiv);
     });
