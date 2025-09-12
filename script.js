@@ -1,21 +1,23 @@
+let cart = [];
+
 const loadContainers = () => {
-    fetch('https://openapi.programming-hero.com/api/categories')
-        .then(res => res.json())
-        .then(data => displayContainers(data.categories));
+    fetch("https://openapi.programming-hero.com/api/categories")
+        .then((res) => res.json())
+        .then((data) => displayContainers(data.categories));
 
     loadAllTrees();
 };
 
 const loadAllTrees = () => {
-    fetch('https://openapi.programming-hero.com/api/plants')
-        .then(res => res.json())
-        .then(data => displayTrees(data.plants));
+    fetch("https://openapi.programming-hero.com/api/plants")
+        .then((res) => res.json())
+        .then((data) => displayTrees(data.plants));
 };
 
 const loadCategoryTrees = (Id) => {
     fetch(`https://openapi.programming-hero.com/api/category/${Id}`)
-        .then(res => res.json())
-        .then(data => displayTrees(data.plants));
+        .then((res) => res.json())
+        .then((data) => displayTrees(data.plants));
 };
 
 const displayContainers = (categories) => {
@@ -30,7 +32,7 @@ const displayContainers = (categories) => {
     `;
     categoriesContainer.appendChild(allTreesBtn);
 
-    categories.forEach(category => {
+    categories.forEach((category) => {
         const btnDiv = document.createElement("div");
         btnDiv.innerHTML = `
             <p onclick="loadCategoryTrees('${category.id}')" class="btn w-full px-5 bg-[#f0fdf4] text-start border-white hover:bg-green-600 hover:text-white">
@@ -54,16 +56,16 @@ const displayTrees = (trees) => {
                 <div class="p-0">
                     <h2 class="font-bold text-lg mt-3">${tree.name}</h2>
                     <p class="text-sm text-gray-600 mt-2">
-                        ${tree.description.slice(0,50)}...
+                        ${tree.description.slice(0, 50)}...
                     </p>
-                    <div class="flex justify-between mt-3">
+                    <div class="flex justify-between items-center mt-3">
                         <p class="bg-[#dcfce7] text-[#15803d] rounded-full px-3 py-1 text-sm font-medium inline-block">
                             ${tree.category}
                         </p>
                         <p class="font-semibold text-lg">৳<span>${tree.price}</span></p>
                     </div>
                     <div class="mt-4">
-                        <button class="btn bg-[#15803d] text-white rounded-full w-full">
+                        <button onclick='addToCart(${JSON.stringify(tree)})' class="btn bg-[#15803d] text-white rounded-full w-full">
                             Add to Cart
                         </button>
                     </div>
@@ -71,6 +73,53 @@ const displayTrees = (trees) => {
             </div>`;
         treesContainer.appendChild(card);
     });
+};
+
+const addToCart = (tree) => {
+    const existingTreeInCart = cart.find(item => item.id === tree.id);
+
+    if (existingTreeInCart) {
+        existingTreeInCart.quantity++;
+    } else {
+        tree.quantity = 1;
+        cart.push(tree);
+    }
+    
+    displayCart();
+};
+
+const displayCart = () => {
+    const cartContainer = document.getElementById("cartAdded-container");
+    const totalElement = document.getElementById("cart-total-price");
+    cartContainer.innerHTML = "";
+    let totalPrice = 0;
+
+    cart.forEach((tree, index) => {
+        const cartItemDiv = document.createElement("div");
+        
+        totalPrice += tree.price * tree.quantity;
+
+        cartItemDiv.innerHTML = `
+           <div class="bg-[#f0fdf4] flex justify-between items-center mb-2 p-2 rounded-lg">
+                <div>
+                    <p class="font-semibold text-sm">${tree.name}</p>
+                    <p class="text-gray-500 text-xs mt-1">
+                        ৳ ${tree.price} <i class="fa-solid fa-xmark text-gray-400 text-xs"></i> ${tree.quantity}
+                    </p>
+                </div>
+                <button onclick="removeFromCart(${index})" class="text-gray-500 hover:text-red-700">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>`;
+        cartContainer.appendChild(cartItemDiv);
+    });
+
+    totalElement.innerText = totalPrice;
+};
+
+const removeFromCart = (index) => {
+    cart.splice(index, 1);
+    displayCart();
 };
 
 loadContainers();
