@@ -8,16 +8,53 @@ const loadContainers = () => {
     loadAllTrees();
 };
 
+const manageSpinner = (isLoading) => {
+    const spinner = document.getElementById("spinner");
+    const treesContainer = document.getElementById("trees-container");
+    if (isLoading) {
+        spinner.classList.remove("hidden");
+        treesContainer.classList.add("hidden");
+    } else {
+        spinner.classList.add("hidden");
+        treesContainer.classList.remove("hidden");
+    }
+};
+
 const loadAllTrees = () => {
+    manageSpinner(true); 
     fetch("https://openapi.programming-hero.com/api/plants")
         .then((res) => res.json())
-        .then((data) => displayTrees(data.plants));
+        .then((data) => {
+            displayTrees(data.plants);
+            manageSpinner(false);
+        });
 };
 
 const loadCategoryTrees = (Id) => {
+    manageSpinner(true);
     fetch(`https://openapi.programming-hero.com/api/category/${Id}`)
         .then((res) => res.json())
-        .then((data) => displayTrees(data.plants));
+        .then((data) => {
+            displayTrees(data.plants);
+            manageSpinner(false);
+        });
+};
+
+
+const handleCategoryClick = (clickedButton, categoryId) => {
+    
+    const allButtons = document.querySelectorAll('.trees-btn');
+    allButtons.forEach(btn => btn.classList.remove('active'));
+
+
+    clickedButton.classList.add('active');
+
+
+    if (categoryId === 'all') {
+        loadAllTrees();
+    } else {
+        loadCategoryTrees(categoryId);
+    }
 };
 
 const displayContainers = (categories) => {
@@ -25,17 +62,20 @@ const displayContainers = (categories) => {
     categoriesContainer.innerHTML = "";
 
     const allTreesBtn = document.createElement("div");
+
     allTreesBtn.innerHTML = `
-        <p onclick="loadAllTrees()" class="btn w-full px-5 bg-[#f0fdf4] text-start border-white hover:bg-green-600 hover:text-white">
+        <p onclick="handleCategoryClick(this, 'all')" class="trees-btn btn w-full px-5 bg-[#f0fdf4] text-start border-white hover:bg-green-600 hover:text-white active">
             All Trees
         </p>
     `;
     categoriesContainer.appendChild(allTreesBtn);
 
+
     categories.forEach((category) => {
         const btnDiv = document.createElement("div");
+
         btnDiv.innerHTML = `
-            <p onclick="loadCategoryTrees('${category.id}')" class="btn w-full px-5 bg-[#f0fdf4] text-start border-white hover:bg-green-600 hover:text-white">
+            <p onclick="handleCategoryClick(this, '${category.id}')" class="trees-btn btn w-full px-5 bg-[#f0fdf4] text-start border-white hover:bg-green-600 hover:text-white">
                 ${category.category_name}
             </p>
         `;
@@ -76,15 +116,13 @@ const displayTrees = (trees) => {
 };
 
 const addToCart = (tree) => {
-    const existingTreeInCart = cart.find(item => item.id === tree.id);
-
+    const existingTreeInCart = cart.find((item) => item.id === tree.id);
     if (existingTreeInCart) {
         existingTreeInCart.quantity++;
     } else {
         tree.quantity = 1;
         cart.push(tree);
     }
-    
     displayCart();
 };
 
@@ -93,14 +131,11 @@ const displayCart = () => {
     const totalElement = document.getElementById("cart-total-price");
     cartContainer.innerHTML = "";
     let totalPrice = 0;
-
     cart.forEach((tree, index) => {
         const cartItemDiv = document.createElement("div");
-        
         totalPrice += tree.price * tree.quantity;
-
         cartItemDiv.innerHTML = `
-           <div class="flex justify-between md:bg-[#f0fdf4]  items-center mb-2 p-2 rounded-lg ">
+           <div class="flex justify-between md:bg-[#f0fdf4] items-center mb-2 p-2 rounded-lg ">
                 <div>
                     <p class="font-semibold text-sm">${tree.name}</p>
                     <p class="text-gray-500 text-xs mt-1">
@@ -114,7 +149,6 @@ const displayCart = () => {
             </div>`;
         cartContainer.appendChild(cartItemDiv);
     });
-
     totalElement.innerText = totalPrice;
 };
 
