@@ -64,7 +64,7 @@ const displayContainers = (categories) => {
     const allTreesBtn = document.createElement("div");
 
     allTreesBtn.innerHTML = `
-        <p onclick="handleCategoryClick(this, 'all')" class="trees-btn w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white active">
+        <p onclick="handleCategoryClick(this, 'all')" class="trees-btn btn btn-default w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white active">
             All Trees
         </p>
     `;
@@ -75,7 +75,7 @@ const displayContainers = (categories) => {
         const btnDiv = document.createElement("div");
 
         btnDiv.innerHTML = `
-            <p onclick="handleCategoryClick(this, '${category.id}')" class="trees-btn w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white ">
+            <p onclick="handleCategoryClick(this, '${category.id}')" class="trees-btn btn-default btn w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white">
                 ${category.category_name}
             </p>
         `;
