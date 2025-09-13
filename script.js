@@ -75,7 +75,7 @@ const displayContainers = (categories) => {
         const btnDiv = document.createElement("div");
 
         btnDiv.innerHTML = `
-            <p onclick="handleCategoryClick(this, '${category.id}')" class="trees-btn w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white">
+            <p onclick="handleCategoryClick(this, '${category.id}')" class="trees-btn w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white active">
                 ${category.category_name}
             </p>
         `;
