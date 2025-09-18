@@ -1,5 +1,23 @@
 let cart = [];
 
+// Add event delegation for tree details and add to cart
+document.getElementById('trees-container').addEventListener('click', function(e) {
+  // Handle tree name clicks for details
+  if (e.target.classList.contains('tree-name')) {
+    const treeId = e.target.getAttribute('data-id');
+    loadTreeDetails(treeId);
+  }
+  
+  // Handle add to cart button clicks
+  if (e.target.classList.contains('add-to-cart-btn')) {
+    const treeData = e.target.getAttribute('data-tree');
+    if (treeData) {
+      const tree = JSON.parse(treeData);
+      addToCart(tree);
+    }
+  }
+});
+
 const loadContainers = () => {
   fetch("https://openapi.programming-hero.com/api/categories")
     .then((res) => res.json())
@@ -43,8 +61,14 @@ const loadCategoryTrees = (Id) => {
 const loadTreeDetails = async (id) => {
   const url = `https://openapi.programming-hero.com/api/plant/${id}`;
   const res = await fetch(url);
-  const details = await res.json();
-  displayTreeDetails(details.data);
+  const data = await res.json();
+  
+  // Check if the request was successful and plants data exists
+  if (data.status && data.plants) {
+    displayTreeDetails(data.plants);
+  } else {
+    console.error("Failed to load tree details:", data.message);
+  }
 };
 
 const displayTreeDetails = (tree) => {
@@ -52,7 +76,7 @@ const displayTreeDetails = (tree) => {
 
   detailsContainer.innerHTML = `
     <figure>
-      <img class="rounded-lg w-full object-cover" src="${tree.image}" alt="${tree.name}" />
+      <img class="rounded-lg w-full object-cover h-60" src="${tree.image}" alt="${tree.name}" />
     </figure>
     <h3 class="font-bold text-2xl mt-4">${tree.name}</h3>
     <p class="py-4 text-gray-600">
@@ -66,12 +90,9 @@ const displayTreeDetails = (tree) => {
     </div>
   `;
 
-  // ✅ Always open modal
   const modal = document.getElementById("my_modal_5");
   modal.showModal();
 };
-
-
 
 const handleCategoryClick = (clickedButton, categoryId) => {
   const allButtons = document.querySelectorAll(".trees-btn");
@@ -91,7 +112,6 @@ const displayContainers = (categories) => {
   categoriesContainer.innerHTML = "";
 
   const allTreesBtn = document.createElement("div");
-
   allTreesBtn.innerHTML = `
         <p onclick="handleCategoryClick(this, 'all')" class="trees-btn btn btn-default w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white active">
             All Trees
@@ -101,7 +121,6 @@ const displayContainers = (categories) => {
 
   categories.forEach((category) => {
     const btnDiv = document.createElement("div");
-
     btnDiv.innerHTML = `
             <p onclick="handleCategoryClick(this, '${category.id}')" class="trees-btn btn-default btn w-full px-2 py-2 bg-[#f0fdf4] text-start text-[0.9rem] font-semibold border-white hover:bg-green-600 hover:text-white">
                 ${category.category_name}
@@ -119,16 +138,12 @@ const displayTrees = (trees) => {
     card.innerHTML = `
            <div class="card bg-base-100 w-full shadow-sm p-3 h-full">
                 <figure>
-                    <img class="rounded-lg h-48 w-full object-cover" src="${
-                      tree.image
-                    }" alt="${tree.name}" />
+                    <img class="rounded-lg h-48 w-full object-cover" src="${tree.image}" alt="${tree.name}" />
                 </figure>
                 <div class="p-0">
-                    <h2 onclick="loadTreeDetails('${
-                      tree.id
-                    }')" class="font-bold text-lg mt-3 cursor-pointer hover:underline">${
-      tree.name
-    }</h2>
+                    <h2 class="tree-name font-bold text-lg mt-3 cursor-pointer hover:underline" data-id="${tree.id}">
+                        ${tree.name}
+                    </h2>
                     <p class="text-sm text-gray-600 mt-2">
                         ${tree.description.slice(0, 50)}...
                     </p>
@@ -136,14 +151,10 @@ const displayTrees = (trees) => {
                         <p class="bg-[#dcfce7] text-[#15803d] rounded-full px-3 py-1 text-sm font-medium inline-block">
                             ${tree.category}
                         </p>
-                        <p class="font-semibold text-lg">৳<span>${
-                          tree.price
-                        }</span></p>
+                        <p class="font-semibold text-lg">৳<span>${tree.price}</span></p>
                     </div>
                     <div class="mt-4">
-                        <button onclick='addToCart(${JSON.stringify(
-                          tree
-                        )})' class="btn bg-[#15803d] text-white rounded-full w-full">
+                        <button class="add-to-cart-btn btn bg-[#15803d] text-white rounded-full w-full" data-tree='${JSON.stringify(tree).replace(/'/g, "&apos;")}'>
                             Add to Cart
                         </button>
                     </div>
@@ -177,11 +188,7 @@ const displayCart = () => {
                 <div>
                     <p class="font-semibold text-sm">${tree.name}</p>
                     <p class="text-gray-500 text-xs mt-1">
-                        ৳ ${
-                          tree.price
-                        } <i class="fa-solid fa-xmark text-gray-400 text-xs"></i> ${
-      tree.quantity
-    }
+                        ৳ ${tree.price} <i class="fa-solid fa-xmark text-gray-400 text-xs"></i> ${tree.quantity}
                     </p>
                 </div>
                 <div>
